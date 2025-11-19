@@ -3,17 +3,12 @@ import { userRoutes } from "../modules/user/user.routes";
 import { authRoutes } from "../modules/auth/auth.routes";
 import { ChatRoutes } from "../modules/chat/chat.Routes";
 import path from "path";
-import { ExampleRoutes } from "../modules/example/example.route";
 
 const router = Router();
 const routes = [
   {
     path: "/user",
     component: userRoutes,
-  },
-  {
-    path: "/examples",
-    component: ExampleRoutes,
   },
   {
     path: "/auth",

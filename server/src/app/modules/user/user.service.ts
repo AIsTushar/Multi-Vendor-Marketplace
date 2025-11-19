@@ -2,12 +2,9 @@ import { User } from "@prisma/client";
 import ApiError from "../../error/ApiErrors";
 import { StatusCodes } from "http-status-codes";
 import { compare, hash } from "bcrypt";
-import jwt, { JwtPayload } from "jsonwebtoken";
 import { OTPFn } from "../../helper/OTPFn";
-import OTPVerify from "../../helper/OTPVerify";
-import { getImageUrl } from "../../helper/uploadFile";
 import { prisma } from "../../../utils/prisma";
-import { jwtHelpers } from "../../helper/jwtHelper";
+import { deleteFromCloudinary, getImageUrl } from "../../helper/cloudinary";
 
 const createUserIntoDB = async (payload: User) => {
   const findUser = await prisma.user.findUnique({
@@ -51,17 +48,14 @@ const changePasswordIntoDB = async (id: string, payload: any) => {
     },
     select: {
       password: true,
-    }
+    },
   });
   if (!findUser) {
     throw new ApiError(StatusCodes.NOT_FOUND, "User not found");
   }
   const comparePassword = await compare(payload.oldPassword, findUser.password);
   if (!comparePassword) {
-    throw new ApiError(
-      StatusCodes.UNAUTHORIZED,
-      "Invalid password"
-    );
+    throw new ApiError(StatusCodes.UNAUTHORIZED, "Invalid password");
   }
 
   const hashedPassword = await hash(payload.newPassword, 10);
@@ -77,8 +71,6 @@ const changePasswordIntoDB = async (id: string, payload: any) => {
 };
 
 const updateUserIntoDB = async (id: string, payload: any, image: any) => {
-  const userImage = image && await getImageUrl(image);
-
   const findUser = await prisma.user.findUnique({
     where: {
       id,
@@ -88,13 +80,20 @@ const updateUserIntoDB = async (id: string, payload: any, image: any) => {
     throw new ApiError(StatusCodes.NOT_FOUND, "User not found");
   }
 
+  if (image) {
+    if (findUser.image) {
+      console.log("Image");
+      await deleteFromCloudinary(findUser.image);
+    }
+    payload.image = await getImageUrl(image);
+  }
+
   const result = await prisma.user.update({
     where: {
       id,
     },
     data: {
       ...payload,
-      image: userImage ?? undefined,
     },
     select: {
       id: true,
@@ -102,6 +101,7 @@ const updateUserIntoDB = async (id: string, payload: any, image: any) => {
       email: true,
       image: true,
       role: true,
+      phone: true,
       createdAt: true,
       updatedAt: true,
     },

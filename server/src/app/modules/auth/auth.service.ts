@@ -6,7 +6,6 @@ import ApiError from "../../error/ApiErrors";
 import { OTPFn } from "../../helper/OTPFn";
 import OTPVerify from "../../helper/OTPVerify";
 import { StatusCodes } from "http-status-codes";
-import { createStripeCustomerAcc } from "../../helper/createStripeCustomerAcc";
 
 const prisma = new PrismaClient();
 const logInFromDB = async (payload: {
@@ -35,16 +34,6 @@ const logInFromDB = async (payload: {
     );
   }
 
-  if (payload.fcmToken) {
-    await prisma.user.update({
-      where: {
-        email: payload.email,
-      },
-      data: {
-        fcmToken: payload.fcmToken,
-      },
-    });
-  }
   const userInfo = {
     email: findUser.email,
     name: findUser.name,
@@ -52,7 +41,6 @@ const logInFromDB = async (payload: {
     image: findUser.image,
     role: findUser.role,
     status: findUser.status,
-    fcmToken: findUser.fcmToken,
   };
   const token = jwtHelpers.generateToken(userInfo, { expiresIn: "15d" });
   return { accessToken: token, ...userInfo };
@@ -81,7 +69,6 @@ const verifyOtp = async (payload: { email: string; otp: number }) => {
         updatedAt: true,
       },
     });
-    await createStripeCustomerAcc(updateUserInfo);
     return updateUserInfo;
   }
 };
@@ -135,9 +122,7 @@ const socialLogin = async (payload: {
       email: true,
       image: true,
       role: true,
-      customerId: true,
       status: true,
-      connectAccountId: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -165,18 +150,15 @@ const socialLogin = async (payload: {
         email: true,
         image: true,
         role: true,
-        customerId: true,
         status: true,
-        connectAccountId: true,
         createdAt: true,
         updatedAt: true,
       },
     });
-    await createStripeCustomerAcc(result);
 
     const accessToken = jwtHelpers.generateToken(
       { id: result.id, email: result.email, role: result.role },
-      { expiresIn: "24h" }
+      { expiresIn: "7d" }
     );
     return {
       ...result,

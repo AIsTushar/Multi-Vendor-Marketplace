@@ -2,7 +2,7 @@ import nodemailer from "nodemailer";
 
 const adminEmail = process.env.MAIL_USER;
 const adminPass = process.env.MAIL_PASS;
-const companyName = process.env.COMPANY_NAME || "EcomGrove";
+const companyName = process.env.COMPANY_NAME || "My Company";
 
 if (!adminEmail || !adminPass) {
   throw new Error("Missing MAIL_USER or MAIL_PASS in environment variables.");

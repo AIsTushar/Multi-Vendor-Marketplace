@@ -8,27 +8,21 @@ datasource db {
 }
 
 model User {
-  id               String          @id @default(auto()) @map("_id") @db.ObjectId
-  email            String          @unique
-  name             String?
-  role             Role            @default(USER)
-  status           Status          @default(PENDING)
-  password         String
-  fcmToken         String?
-  image            String?
-  latitude         Float?
-  longitude        Float?
-  location         String?
-  customerId       String?
-  connectAccountId String?
-  isVerified       Boolean         @default(false)
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  receiver         Notifications[] @relation("receiverDetails")
-  sender           Notifications[] @relation("senderDetails")
-  Conversation1    Conversation[]  @relation("User1Conversations")
-  Conversation2    Conversation[]  @relation("User2Conversations")
-  Message          Message[]       @relation("UserMessages")
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  email      String   @unique
+  name       String?
+  role       Role     @default(BUYER)
+  status     Status   @default(PENDING)
+  password   String
+  image      String?
+  phone      String?
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  Conversation1 Conversation[] @relation("User1Conversations")
+  Conversation2 Conversation[] @relation("User2Conversations")
+  Message       Message[]      @relation("UserMessages")
 
   @@map("users")
 }
@@ -42,19 +36,6 @@ model Otp {
   updatedAt DateTime  @updatedAt
 
   @@map("otps")
-}
-
-model Notifications {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  receiverId String   @db.ObjectId
-  senderId   String?  @db.ObjectId
-  title      String
-  body       String
-  read       Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  receiver   User     @relation("receiverDetails", fields: [receiverId], references: [id])
-  sender     User?    @relation("senderDetails", fields: [senderId], references: [id])
 }
 
 model Conversation {
@@ -98,7 +79,8 @@ model Example {
 }
 
 enum Role {
-  USER
+  BUYER
+  SELLER
   ADMIN
 }
 
