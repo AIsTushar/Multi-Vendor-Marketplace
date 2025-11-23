@@ -82,7 +82,6 @@ const updateUserIntoDB = async (id: string, payload: any, image: any) => {
 
   if (image) {
     if (findUser.image) {
-      console.log("Image");
       await deleteFromCloudinary(findUser.image);
     }
     payload.image = await getImageUrl(image);

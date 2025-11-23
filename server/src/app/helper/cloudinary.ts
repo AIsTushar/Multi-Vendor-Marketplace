@@ -102,4 +102,9 @@ export const deleteManyFromCloudinary = async (urls: string[]) => {
 
 // ---- Middleware exports ----
 export const uploadSingleImage = upload.single("image");
+export const uploadSingleFile = upload.single("file");
 export const uploadMultipleImages = upload.array("images", 3);
+export const uploadImageAndFile = upload.fields([
+  { name: "image", maxCount: 1 },
+  { name: "file", maxCount: 1 },
+]);

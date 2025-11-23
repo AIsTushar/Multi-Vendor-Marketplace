@@ -11,7 +11,7 @@ const port = config.port || 5000;
 async function main() {
   const server: Server = app.listen(port, () => {
     console.log("Sever is running on port ", port);
-    // PrismaConnection();  // for seed super admin
+    PrismaConnection(); // for seed super admin
   });
 
   // initializeSocketIO(server);  // If you want to use socket
